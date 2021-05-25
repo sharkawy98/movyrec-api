@@ -6,7 +6,9 @@ db = SQLAlchemy(session_options={'expire_on_commit': False})
 
 
 def register_blueprints(app):
-    blueprints = ()
+    blueprints = (
+        'users',
+    )
     for blueprint in blueprints:
         module = import_module(f'api.{blueprint}')
         app.register_blueprint(module.blueprint)
