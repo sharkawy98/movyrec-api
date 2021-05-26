@@ -13,10 +13,15 @@ def register_blueprints(app):
         module = import_module(f'api.{blueprint}')
         app.register_blueprint(module.blueprint)
 
+def config_database(app):
+    @app.before_first_request
+    def create_default():
+        db.create_all()
+
 def create_app(path, config):
     app = Flask(__name__)
     app.config.from_object(config)
     app.path = path
     register_blueprints(app)
-
+    config_database(app)
     return app
