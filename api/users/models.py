@@ -46,3 +46,37 @@ class User(BaseModel):
     @classmethod 
     def get_by_id(cls, id):                 
         return cls.query.filter_by(id=id).first()
+
+
+
+from marshmallow import Schema, ValidationError, fields, \
+    validate, validates
+from datetime import datetime
+
+
+class UserSchema(Schema):
+    id = fields.Integer(dump_only=True)
+    full_name = fields.String(required=True)
+    email = fields.Email(required=True)
+    username = fields.String(validate=validate.Length(max=30),
+                             required=True)
+    password = fields.String(load_only=True, required=True, 
+                             validate=validate.Regexp(
+                                '^(?=.*[0-9]+.*)(?=.*[a-zA-Z]+.*).{7,}$', 
+                                error='Password must contain at least one letter, one number and be longer than six charaters.'))
+    birthdate = fields.Date(format='%Y-%m-%d', required=True)
+    gender = fields.String(validate=validate.Length(max=1), 
+                           required=True)
+    is_active = fields.Boolean(dump_only=True)
+    display_img = fields.String(dump_only=True)
+    access_token = fields.Boolean(dump_only=True)
+
+    @validates('username')
+    def validate_username(self, username):
+        if User.get_by_username(username):
+            raise ValidationError('Username already exists.')
+
+    @validates('email')
+    def validate_email(self, email):
+        if User.get_by_email(email):
+            raise ValidationError('Email already exists.')
