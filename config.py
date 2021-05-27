@@ -1,4 +1,5 @@
 from os import environ
+from datetime import timedelta
 
 
 class Config(object):
@@ -14,6 +15,12 @@ class DebugConfig(Config):
         'movyrek_SECRET_KEY', 
         'this-is-secret'
     )
+
+    JWT_SECRET_KEY = "super-secret"
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=183)  # 6 months
+    JWT_ERROR_MESSAGE_KEY = "message"
+    JWT_BLACKLIST_ENABLED = True
+    JWT_BLACKLIST_TOKEN_CHECKS = ["access", "refresh"]
 
 app_config_dict = {
     'Debug': DebugConfig,
