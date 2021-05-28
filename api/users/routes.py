@@ -3,7 +3,8 @@ from marshmallow import ValidationError
 from flask_jwt_extended import (
     create_access_token, 
     jwt_required, 
-    get_jwt_identity
+    get_jwt_identity,
+    get_jwt
 )
 
 from api.users import blueprint
@@ -11,6 +12,9 @@ from api.users.models import User, UserSchema
 
 
 user_schema = UserSchema()
+
+black_list = set()
+
 
 @blueprint.route('/register', methods=['POST'])
 def user_register():
@@ -57,3 +61,12 @@ def user_info():
     user_id = get_jwt_identity()
     user = User.get_by_id(user_id)
     return user_schema.dump(user), 200
+
+
+@blueprint.route('/logout', methods=['POST'])
+@jwt_required()
+def user_logout():
+    jti = get_jwt()["jti"]
+    black_list.add(jti)
+    return {"message": "Logged out successfully."}, 200
+    
