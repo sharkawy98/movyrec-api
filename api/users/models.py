@@ -70,13 +70,3 @@ class UserSchema(Schema):
     is_active = fields.Boolean(dump_only=True)
     display_img = fields.String(dump_only=True)
     access_token = fields.Boolean(dump_only=True)
-
-    @validates('username')
-    def validate_username(self, username):
-        if User.get_by_username(username):
-            raise ValidationError('Username already exists.')
-
-    @validates('email')
-    def validate_email(self, email):
-        if User.get_by_email(email):
-            raise ValidationError('Email already exists.')
