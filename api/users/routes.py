@@ -49,3 +49,11 @@ def user_login():
     access_token = create_access_token(identity=user.id)
 
     return {"access_token": access_token}, 200
+
+
+@blueprint.route('/user_info')
+@jwt_required()
+def user_info():
+    user_id = get_jwt_identity()
+    user = User.get_by_id(user_id)
+    return user_schema.dump(user), 200
