@@ -17,7 +17,7 @@ class DebugConfig(Config):
     )
 
     JWT_SECRET_KEY = "super-secret"
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=183)  # 6 months
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=183)  # 6 months
     JWT_ERROR_MESSAGE_KEY = "message"
     JWT_BLACKLIST_ENABLED = True
     JWT_BLACKLIST_TOKEN_CHECKS = ["access", "refresh"]
