@@ -86,4 +86,16 @@ def user_logout():
 
 @blueprint.route('/activate/<token>')
 def user_activation(token):
-    pass
+    try:
+        email = activation.confirm_activation(token)
+    except SignatureExpired:
+        return '<h1>The token is expired. Register again !</h1>'
+    except BadTimeSignature:
+        return '<h1>Invalid token.</h1>'
+
+    # update activation attribute in the database
+    user = User.get_by_email(email)
+    user.is_active = True
+    user.update()
+
+    return '<h1>Your account is activated successfully.</h1>'
