@@ -1,11 +1,14 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
+from flask_mail import Mail
 from importlib import import_module
 
 db = SQLAlchemy(session_options={'expire_on_commit': False})
 
 jwt = JWTManager()
+
+mail = Mail()
 
 
 def register_blueprints(app):
@@ -22,7 +25,7 @@ def config_database(app):
         db.create_all()
 
 def create_app(path, config):
-    app = Flask(__name__)
+    app = Flask(__name__, template_folder='../utils')
     app.config.from_object(config)
     app.path = path
     register_blueprints(app)

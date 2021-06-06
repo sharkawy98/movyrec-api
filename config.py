@@ -22,6 +22,13 @@ class DebugConfig(Config):
     JWT_BLACKLIST_ENABLED = True
     JWT_BLACKLIST_TOKEN_CHECKS = ["access", "refresh"]
 
+    MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_PORT = 465
+    MAIL_USE_SSL = True
+    MAIL_USERNAME = 'movyrek@gmail.com'
+    MAIL_PASSWORD = 'movyrek123'
+    ACTIVATION_EMAIL_SALT = 'activation-salt'
+
 app_config_dict = {
     'Debug': DebugConfig,
 }

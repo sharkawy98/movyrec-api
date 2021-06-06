@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, render_template, url_for
 from marshmallow import ValidationError
 from flask_jwt_extended import (
     create_access_token, 
@@ -6,9 +6,12 @@ from flask_jwt_extended import (
     get_jwt_identity,
     get_jwt
 )
+from itsdangerous import SignatureExpired, BadTimeSignature
+import os
 
 from api.users import blueprint
 from api.users.models import User, UserSchema
+from utils import activation, send_email
 
 
 user_schema = UserSchema()
@@ -33,6 +36,16 @@ def user_register():
 
     user = User(**data)
     user.save()
+
+    # send activation link to new registered user 
+    token = activation.generate_activation_token(user.email)
+    confirm_url = url_for('users_blueprint.user_activation', 
+        token=token, _external=True)
+    
+    html = render_template('activation_template.html',
+        username=user.username, confirm_url=confirm_url)
+    subject = "Account Activation"
+    send_email.send_email(user.email, subject, html)
     
     return user_schema.dump(user), 201
 
@@ -70,3 +83,7 @@ def user_logout():
     black_list.add(jti)
     return {"message": "Logged out successfully."}, 200
     
+
+@blueprint.route('/activate/<token>')
+def user_activation(token):
+    pass

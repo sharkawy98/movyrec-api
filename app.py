@@ -3,7 +3,7 @@ from os import environ
 from sys import exit
 
 from config import app_config_dict
-from api import create_app, db, jwt
+from api import create_app, db, jwt, mail
 from api.users.routes import black_list
 
 
@@ -22,6 +22,8 @@ jwt.init_app(app)
 def check_if_token_in_blacklist(jwt_header, jwt_payload):
     jti = jwt_payload["jti"]
     return jti in black_list
+
+mail.init_app(app)
 
 if __name__ == '__main__':
     app.run()
