@@ -7,11 +7,10 @@ from flask_jwt_extended import (
     get_jwt
 )
 from itsdangerous import SignatureExpired, BadTimeSignature
-import os
 
 from api.users import blueprint
 from api.users.models import User, UserSchema
-from utils import activation, send_email
+from utils import activation, send_email, verification
 
 
 user_schema = UserSchema()
@@ -99,3 +98,40 @@ def user_activation(token):
     user.update()
 
     return '<h1>Your account is activated successfully.</h1>'
+
+
+@blueprint.route('/forget_password', methods=['POST'])
+def forget_password():
+    email = request.json.get('email')
+    user = User.get_by_email(email)
+    if not user:
+        return {"message": "Invalid email address."}, 401
+
+    # send verification code to user's email
+    code = verification.generate_verification_code()
+    user.verif_code = code
+    user.update()
+
+    html = render_template('verification_template.html',
+        verification_code=code)
+    subject = "Reset Password"
+    send_email.send_email(user.email, subject, html)
+
+    return {"message": "Verification code is sent"}, 200
+
+
+@blueprint.route('/reset_password', methods=['POST'])
+def reset_password():
+    email = request.json.get("email")
+    new_password = request.json.get("new_password")
+    verif_code = request.json.get("verif_code")
+
+    user = User.get_by_email(email)
+    if user.verif_code != verif_code:
+        return {"messege": "Not allowed"}, 403
+
+    user.set_password(new_password)
+    user.update()
+
+    return {"message": "Reseted passsword successfully."}, 200
+    

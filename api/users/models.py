@@ -15,6 +15,7 @@ class User(BaseModel):
     gender = db.Column(db.String(1), nullable=False)
     is_active = db.Column(db.Boolean(), default=False)
     display_img = db.Column(db.String(255), default=None)
+    verif_code = db.Column(db.String(6), default=None)
 
     def __repr__(self):
         return f'User {self.username}'
@@ -69,4 +70,4 @@ class UserSchema(Schema):
                            required=True)
     is_active = fields.Boolean(dump_only=True)
     display_img = fields.String(dump_only=True)
-    access_token = fields.Boolean(dump_only=True)
+    verif_code = fields.String(dump_only=True)
