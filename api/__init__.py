@@ -17,6 +17,7 @@ cors = CORS()
 def register_blueprints(app):
     blueprints = (
         'users',
+        'movies',
     )
     for blueprint in blueprints:
         module = import_module(f'api.{blueprint}')
