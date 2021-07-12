@@ -1,4 +1,4 @@
-from os import environ
+from os import environ, path
 from datetime import timedelta
 
 
@@ -28,6 +28,10 @@ class DebugConfig(Config):
     MAIL_USERNAME = 'movyrek@gmail.com'
     MAIL_PASSWORD = 'movyrek123'
     ACTIVATION_EMAIL_SALT = 'activation-salt'
+
+    basedir = path.abspath(path.dirname(__file__))
+    UPLOAD_FOLDER = path.join(basedir, 'uploads')
+
 
 app_config_dict = {
     'Debug': DebugConfig,

@@ -1,4 +1,10 @@
-from flask import request, render_template, url_for
+from flask import (
+    request, 
+    render_template, 
+    url_for, 
+    current_app,
+    send_from_directory
+)
 from marshmallow import ValidationError
 from flask_jwt_extended import (
     create_access_token, 
@@ -7,6 +13,9 @@ from flask_jwt_extended import (
     get_jwt
 )
 from itsdangerous import SignatureExpired, BadTimeSignature
+from os import error, path
+from time import time
+from werkzeug.exceptions import NotFound
 
 from api.users import blueprint
 from api.users.models import User, UserSchema
@@ -134,4 +143,47 @@ def reset_password():
     user.update()
 
     return {"message": "Reseted passsword successfully."}, 200
-    
+
+
+@blueprint.route('/display_image', methods=['PUT'])
+@jwt_required()
+def upload_display_image():
+    ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+    def allowed_file(filename):
+        return '.' in filename and filename.rsplit('.', 1)[1].lower()\
+            in ALLOWED_EXTENSIONS
+
+    if 'image' not in request.files:
+        return {"message": "No image selected for uploading"}, 400
+    file = request.files['image']
+
+    if file and allowed_file(file.filename):
+        user = User.get_by_id(id=get_jwt_identity())
+
+        file.filename = user.username + '_' + str(int(time())) \
+            + '.' + file.filename.rsplit('.',1)[1]
+        target = path.join(
+            current_app.config["UPLOAD_FOLDER"], 
+            file.filename
+        )
+        file.save(target)
+
+        user.display_img = file.filename
+        user.update()
+
+        return {"message": "Uploaded image successfully"}, 201
+    else:
+        return {"message": "File type not allowed, upload png, \
+            jpg, jpeg, gif"}, 400
+
+
+@blueprint.route("/display_image/<filename>")
+@jwt_required()
+def get_display_image(filename):
+    try:
+        return send_from_directory(
+            current_app.config['UPLOAD_FOLDER'], 
+            filename
+        )
+    except NotFound as err:
+        return {"message": "Image not found."}, 404

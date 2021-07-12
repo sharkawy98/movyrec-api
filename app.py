@@ -3,7 +3,7 @@ from os import environ
 from sys import exit
 
 from config import app_config_dict
-from api import create_app, db, jwt, mail
+from api import create_app, db, jwt, mail, cors
 from api.users.routes import black_list
 
 
@@ -14,6 +14,7 @@ except:
     exit('Invalid Config Mode!')    
 
 app = create_app(Path.cwd(), config_mode)
+cors.init_app(app)
 db.init_app(app)
 
 jwt.init_app(app)

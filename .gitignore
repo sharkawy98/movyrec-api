@@ -128,3 +128,6 @@ dmypy.json
 
 # VScode configs
 .vscode
+
+# uploads folder
+uploads
