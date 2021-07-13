@@ -14,3 +14,37 @@ class Movie(BaseModel):
 
     def __repr__(self):
         return f'Movie {self.title}'
+
+
+class WatchList(BaseModel):
+    __tablename__ = 'watch_list'
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
+    movie_id = db.Column(db.Integer(), db.ForeignKey('movies.tmdb_id'))
+
+    def __init__(self, user_id, movie_id):
+        self.user_id = user_id
+        self.movie_id = movie_id
+
+
+class Rating(BaseModel):
+    __tablename__ = 'ratings'
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
+    movie_id = db.Column(db.Integer(), db.ForeignKey('movies.tmdb_id'))
+    rating = db.Column(db.Float(), nullable=False)
+
+    def __init__(self, user_id, movie_id, rating):
+        self.user_id = user_id
+        self.movie_id = movie_id
+        self.rating = rating
+
+
+class Review(BaseModel):
+    __tablename__ = 'reviews'
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
+    movie_id = db.Column(db.Integer(), db.ForeignKey('movies.tmdb_id'))
+    review = db.Column(db.Text(), nullable=False)
+
+    def __init__(self, user_id, movie_id, review):
+        self.user_id = user_id
+        self.movie_id = movie_id
+        self.review = review
