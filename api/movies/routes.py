@@ -5,7 +5,10 @@ from api.movies import blueprint
 from api.movies.models import (
     WatchList, 
     Rating, 
-    Review
+    Review,
+    watch_list_schema,
+    ratings_schema,
+    reviews_schema
 )
 
 
@@ -44,3 +47,17 @@ def review_movie(movie_id):
 
     return {"message": "Reviewed movie successfuly."}, 200
 
+
+@blueprint.route('/user_watch_list')
+@jwt_required()
+def get_watch_list():
+    user_id = get_jwt_identity()
+    watch_list = WatchList.query.filter_by(user_id=user_id).all()
+    return {"watch_list": watch_list_schema.dump(watch_list)}, 200
+
+
+@blueprint.route('/movie_reviews/<movie_id>')
+@jwt_required()
+def get_reviews(movie_id):
+    reviews = Review.query.filter_by(movie_id=movie_id).all()
+    return {"reviews": reviews_schema.dump(reviews)}, 200

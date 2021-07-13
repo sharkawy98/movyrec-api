@@ -48,3 +48,23 @@ class Review(BaseModel):
         self.user_id = user_id
         self.movie_id = movie_id
         self.review = review
+
+
+from marshmallow import Schema, fields
+
+
+class WatchListSchema(Schema):
+    movie_id = fields.Integer(dump_only=True)
+
+class RatingsSchema(Schema):
+    movie_id = fields.Integer(dump_only=True)
+    rating = fields.Float(dump_only=True)
+
+class ReviewsSchema(Schema):
+    user_id = fields.Integer(dump_only=True)
+    review = fields.String(dump_only=True)
+
+
+watch_list_schema = WatchListSchema(many=True)
+ratings_schema = RatingsSchema(many=True)
+reviews_schema = ReviewsSchema(many=True)
