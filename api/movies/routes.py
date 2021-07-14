@@ -61,3 +61,20 @@ def get_watch_list():
 def get_reviews(movie_id):
     reviews = Review.query.filter_by(movie_id=movie_id).all()
     return {"reviews": reviews_schema.dump(reviews)}, 200
+
+
+@blueprint.route('/user_ratings')
+@jwt_required()
+def get_ratings():
+    user_id = get_jwt_identity()
+    ratings = Rating.query.filter_by(user_id=user_id).all()
+    return {"ratings": ratings_schema.dump(ratings)},200
+
+
+@blueprint.route('/movie_rating/<movie_id>')
+@jwt_required()
+def get_movie_rating(movie_id):
+    user_id = get_jwt_identity()
+    rating = Rating.query.filter_by(movie_id=movie_id) \
+        .filter_by(user_id=user_id).first()
+    return {"rating": rating.rating}, 200
