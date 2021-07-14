@@ -78,3 +78,23 @@ def get_movie_rating(movie_id):
     rating = Rating.query.filter_by(movie_id=movie_id) \
         .filter_by(user_id=user_id).first()
     return {"rating": rating.rating}, 200
+
+
+@blueprint.route('/watch_list/<movie_id>', methods=['DELETE'])
+@jwt_required()
+def remove_from_watchlist(movie_id):
+    user_id = get_jwt_identity()
+    wl = WatchList.query.filter_by(movie_id=movie_id) \
+        .filter_by(user_id=user_id).first()
+    wl.delete()
+    return {"message": "Removed from watch_list successfuly."}, 200
+
+
+@blueprint.route('/review/<movie_id>', methods=['DELETE'])
+@jwt_required()
+def remove_review(movie_id):
+    user_id = get_jwt_identity()
+    r = Review.query.filter_by(movie_id=movie_id) \
+        .filter_by(user_id=user_id).first()
+    r.delete()
+    return {"message": "Removed your review successfuly."}, 200
