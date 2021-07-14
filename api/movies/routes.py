@@ -98,3 +98,16 @@ def remove_review(movie_id):
         .filter_by(user_id=user_id).first()
     r.delete()
     return {"message": "Removed your review successfuly."}, 200
+
+
+@blueprint.route('/rate/<movie_id>', methods=['PATCH'])
+@jwt_required()
+def update_rating(movie_id):
+    user_id = get_jwt_identity()
+    new_rating = request.json.get('rating')
+
+    r = Rating.query.filter_by(movie_id=movie_id) \
+        .filter_by(user_id=user_id).first()
+    r.rating = new_rating
+    r.update()
+    return {"message": "Updated your rating successfuly."}, 200
