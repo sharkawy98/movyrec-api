@@ -16,15 +16,15 @@ from itsdangerous import SignatureExpired, BadTimeSignature
 from os import error, path
 from time import time
 from werkzeug.exceptions import NotFound
+from datetime import datetime
 
 from api.users import blueprint
 from api.users.models import User, UserSchema
 from utils import activation, send_email, verification
+from api.base_models import TokenBlocklist
 
 
 user_schema = UserSchema()
-
-black_list = set()
 
 
 @blueprint.route('/register', methods=['POST'])
@@ -88,7 +88,8 @@ def user_info():
 @jwt_required()
 def user_logout():
     jti = get_jwt()["jti"]
-    black_list.add(jti)
+    tbl = TokenBlocklist(jti=jti, created_at=datetime.now())
+    tbl.save()
     return {"message": "Logged out successfully."}, 200
     
 
