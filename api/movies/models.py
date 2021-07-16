@@ -1,5 +1,4 @@
-from api.base_model import BaseModel, db
-
+from api.base_models import BaseModel, db, ExistenceCheck
 
 class Movie(BaseModel):
     __tablename__ = 'movies'
@@ -16,7 +15,7 @@ class Movie(BaseModel):
         return f'Movie {self.title}'
 
 
-class WatchList(BaseModel):
+class WatchList(BaseModel, ExistenceCheck):
     __tablename__ = 'watch_list'
     user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
     movie_id = db.Column(db.Integer(), db.ForeignKey('movies.tmdb_id'))
@@ -26,7 +25,7 @@ class WatchList(BaseModel):
         self.movie_id = movie_id
 
 
-class Rating(BaseModel):
+class Rating(BaseModel, ExistenceCheck):
     __tablename__ = 'ratings'
     user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
     movie_id = db.Column(db.Integer(), db.ForeignKey('movies.tmdb_id'))
@@ -38,7 +37,7 @@ class Rating(BaseModel):
         self.rating = rating
 
 
-class Review(BaseModel):
+class Review(BaseModel, ExistenceCheck):
     __tablename__ = 'reviews'
     user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
     movie_id = db.Column(db.Integer(), db.ForeignKey('movies.tmdb_id'))
@@ -50,8 +49,8 @@ class Review(BaseModel):
         self.review = review
 
 
-from marshmallow import Schema, fields
 
+from marshmallow import Schema, fields
 
 class WatchListSchema(Schema):
     movie_id = fields.Integer(dump_only=True)

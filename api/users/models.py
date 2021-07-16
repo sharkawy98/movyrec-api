@@ -2,7 +2,7 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, \
     check_password_hash
 
-from api.base_model import BaseModel, db
+from api.base_models import BaseModel, db
 
 
 class User(BaseModel):

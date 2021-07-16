@@ -18,6 +18,9 @@ from api.movies.models import (
 def add_to_watchlist(movie_id):
     user_id = get_jwt_identity()
 
+    if WatchList.is_exist(user_id, movie_id):
+        return {"message": "You added this movie before."}, 409
+
     wl = WatchList(user_id, movie_id)
     wl.save()
 
@@ -28,8 +31,11 @@ def add_to_watchlist(movie_id):
 @jwt_required()
 def rate_movie(movie_id):
     user_id = get_jwt_identity()
-    rating = request.json.get('rating')
 
+    if Rating.is_exist(user_id, movie_id):
+        return {"message": "You rated this movie before."}, 409
+
+    rating = request.json.get('rating')
     r = Rating(user_id, movie_id, rating)
     r.save()
 
@@ -40,8 +46,11 @@ def rate_movie(movie_id):
 @jwt_required()
 def review_movie(movie_id):
     user_id = get_jwt_identity()
-    review = request.json.get('review')
 
+    if Review.is_exist(user_id, movie_id):
+        return {"message": "You reviewed this movie before."}, 409
+
+    review = request.json.get('review')
     r = Review(user_id, movie_id, review)
     r.save()
 

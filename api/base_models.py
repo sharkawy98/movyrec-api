@@ -1,4 +1,3 @@
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from api import db
@@ -29,3 +28,14 @@ class BaseModel(db.Model):
             db.session.commit()
         except SQLAlchemyError:
             db.session.rollback()
+
+
+
+class ExistenceCheck():
+    @classmethod
+    def is_exist(cls, user_id, movie_id):
+        obj = cls.query.filter_by(user_id=user_id) \
+                .filter_by(movie_id=movie_id).first()
+        if obj:
+            return True
+        return False
