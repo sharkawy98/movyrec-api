@@ -56,13 +56,6 @@ def get_watch_list():
     return {"watch_list": watch_list_schema.dump(watch_list)}, 200
 
 
-@blueprint.route('/movie_reviews/<movie_id>')
-@jwt_required()
-def get_reviews(movie_id):
-    reviews = Review.query.filter_by(movie_id=movie_id).all()
-    return {"reviews": reviews_schema.dump(reviews)}, 200
-
-
 @blueprint.route('/user_ratings')
 @jwt_required()
 def get_ratings():
@@ -71,13 +64,19 @@ def get_ratings():
     return {"ratings": ratings_schema.dump(ratings)},200
 
 
-@blueprint.route('/movie_rating/<movie_id>')
+@blueprint.route('/movie_interactions/<movie_id>')
 @jwt_required()
-def get_movie_rating(movie_id):
+def get_movie_interactions(movie_id):
     user_id = get_jwt_identity()
+
     rating = Rating.query.filter_by(movie_id=movie_id) \
         .filter_by(user_id=user_id).first()
-    return {"rating": rating.rating}, 200
+    reviews = Review.query.filter_by(movie_id=movie_id).all()
+    
+    return {
+        "user_rating": rating.rating,
+        "movie_reviews": reviews_schema.dump(reviews)
+    }, 200
 
 
 @blueprint.route('/watch_list/<movie_id>', methods=['DELETE'])
