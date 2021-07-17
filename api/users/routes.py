@@ -2,8 +2,7 @@ from flask import (
     request, 
     render_template, 
     url_for, 
-    current_app,
-    send_from_directory
+    current_app
 )
 from marshmallow import ValidationError
 from flask_jwt_extended import (
@@ -13,10 +12,8 @@ from flask_jwt_extended import (
     get_jwt
 )
 from itsdangerous import SignatureExpired, BadTimeSignature
-from os import error, path
-from time import time
-from werkzeug.exceptions import NotFound
 from datetime import datetime
+import cloudinary, cloudinary.uploader
 
 from api.users import blueprint
 from api.users.models import User, UserSchema
@@ -161,30 +158,20 @@ def upload_display_image():
     if file and allowed_file(file.filename):
         user = User.get_by_id(id=get_jwt_identity())
 
-        file.filename = user.username + '_' + str(int(time())) \
-            + '.' + file.filename.rsplit('.',1)[1]
-        target = path.join(
-            current_app.config["UPLOAD_FOLDER"], 
-            file.filename
-        )
-        file.save(target)
+        filename = user.username
 
-        user.display_img = file.filename
+        cloudinary.config(
+            cloud_name = current_app.config['CLOUD_NAME'], 
+            api_key= current_app.config['API_KEY'], 
+            api_secret=current_app.config['API_SECRET']
+        )
+        upload_result = cloudinary.uploader.upload(file=file, 
+            public_id=filename)
+
+        user.display_img = upload_result['url']
         user.update()
 
-        return {"message": "Uploaded image successfully"}, 201
+        return {"display_img": upload_result['url']}, 200
     else:
         return {"message": "File type not allowed, upload png, \
             jpg, jpeg, gif"}, 400
-
-
-@blueprint.route("/display_image/<filename>")
-@jwt_required()
-def get_display_image(filename):
-    try:
-        return send_from_directory(
-            current_app.config['UPLOAD_FOLDER'], 
-            filename
-        )
-    except NotFound as err:
-        return {"message": "Image not found."}, 404
