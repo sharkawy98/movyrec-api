@@ -1,9 +1,12 @@
-from os import environ, path
+from os import getenv
 from datetime import timedelta
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class Config(object):
-    SQLALCHEMY_DATABASE_URI = environ.get(
+    SQLALCHEMY_DATABASE_URI = getenv(
         'movyrek_DATABASE_URL',
         'sqlite:///db.sqlite3?check_same_thread=False'
     )
@@ -11,12 +14,9 @@ class Config(object):
 
 class DebugConfig(Config):
     DEBUG = True
-    SECRET_KEY = environ.get(
-        'movyrek_SECRET_KEY', 
-        'this-is-secret'
-    )
+    SECRET_KEY = getenv('movyrek_SECRET_KEY')
 
-    JWT_SECRET_KEY = "super-secret"
+    JWT_SECRET_KEY = getenv('JWT_SECRET_KEY')
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=183)  # 6 months
     JWT_ERROR_MESSAGE_KEY = "message"
     JWT_BLACKLIST_ENABLED = True
@@ -25,12 +25,13 @@ class DebugConfig(Config):
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 465
     MAIL_USE_SSL = True
-    MAIL_USERNAME = 'movyrek@gmail.com'
-    MAIL_PASSWORD = 'movyrek123'
-    ACTIVATION_EMAIL_SALT = 'activation-salt'
+    MAIL_USERNAME = getenv('MAIL_USERNAME')
+    MAIL_PASSWORD = getenv('MAIL_PASSWORD')
+    ACTIVATION_EMAIL_SALT = getenv('ACTIVATION_EMAIL_SALT')
 
-    basedir = path.abspath(path.dirname(__file__))
-    UPLOAD_FOLDER = path.join(basedir, 'uploads')
+    CLOUD_NAME = getenv('CLOUD_NAME')
+    API_KEY = getenv('API_KEY')
+    API_SECRET = getenv('API_SECRET')
 
 
 app_config_dict = {
