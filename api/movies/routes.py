@@ -10,7 +10,7 @@ from api.movies.models import (
     ratings_schema,
     reviews_schema
 )
-
+from utils.movie_metadata import get_metadata
 
 
 @blueprint.route('/watch_list/<movie_id>', methods=['POST'])
@@ -62,7 +62,12 @@ def review_movie(movie_id):
 def get_watch_list():
     user_id = get_jwt_identity()
     watch_list = WatchList.query.filter_by(user_id=user_id).all()
-    return {"watch_list": watch_list_schema.dump(watch_list)}, 200
+
+    result = []
+    for m in watch_list:
+        result.append(get_metadata(m.movie_id))
+
+    return {"watch_list": result}, 200
 
 
 @blueprint.route('/user_ratings')
@@ -70,7 +75,12 @@ def get_watch_list():
 def get_ratings():
     user_id = get_jwt_identity()
     ratings = Rating.query.filter_by(user_id=user_id).all()
-    return {"ratings": ratings_schema.dump(ratings)},200
+
+    result = []
+    for r in ratings:
+        result.append(get_metadata(r.movie_id))
+
+    return {"ratings": result}, 200
 
 
 @blueprint.route('/movie_interactions/<movie_id>')
