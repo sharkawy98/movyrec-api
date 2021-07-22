@@ -65,8 +65,8 @@ def user_login():
     if not user or not user.check_password(password):
         return {"message": "Username or password is incorrect"}, 401
 
-    # if not user.is_active:
-    #     return {"message": "Your account is not activated yet."}, 403
+    if not user.is_active:
+        return {"message": "Your account is not activated yet."}, 403
 
     access_token = create_access_token(identity=user.id)
 
