@@ -18,6 +18,7 @@ def register_blueprints(app):
     blueprints = (
         'users',
         'movies',
+        'recommendations',
     )
     for blueprint in blueprints:
         module = import_module(f'api.{blueprint}')
