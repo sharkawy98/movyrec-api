@@ -5,3 +5,5 @@ blueprint = Blueprint(
     __name__,
     url_prefix='/recommendations',
 )
+
+from . import routes

@@ -33,6 +33,8 @@ class DebugConfig(Config):
     API_KEY = getenv('API_KEY')
     API_SECRET = getenv('API_SECRET')
 
+    TMDB_KEY = getenv('TMDB_KEY')
+
 
 app_config_dict = {
     'Debug': DebugConfig,
