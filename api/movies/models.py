@@ -2,14 +2,15 @@ from api.base_models import BaseModel, db, ExistenceCheck
 
 class Movie(BaseModel):
     __tablename__ = 'movies'
-    tmdb_id = db.Column(db.Integer())    
-    imdb_id = db.Column(db.String(20))         
-    title = db.Column(db.String(100))
-    overview = db.Column(db.Text())
+    tmdb_id = db.Column(db.Integer())            
+    imdb_id = db.Column(db.String(20))            
+    title = db.Column(db.String(100))            
     release_date = db.Column(db.Date())
-    runtime = db.Column(db.Float())
-    vote_average = db.Column(db.Float())
-    vote_count = db.Column(db.Float())
+    score = db.Column(db.Float())           
+    overview = db.Column(db.Text())         
+    genres = db.Column(db.String(100))    
+    keywords = db.Column(db.String(255))          
+    cluster = db.Column(db.Integer())        
 
     def __repr__(self):
         return f'Movie {self.title}'
