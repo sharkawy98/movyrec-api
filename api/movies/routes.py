@@ -1,8 +1,10 @@
 from flask import request
 from flask_jwt_extended import jwt_required, get_jwt_identity
+import random
 
 from api.movies import blueprint
 from api.movies.models import (
+    Movie,
     WatchList, 
     Rating, 
     Review,
@@ -129,3 +131,21 @@ def update_rating(movie_id):
     r.rating = new_rating
     r.update()
     return {"message": "Updated your rating successfuly."}, 200
+
+
+@blueprint.route('/')
+@jwt_required()
+def get_random_movies():
+    movies_ids = []
+    for cluster in range(14):
+        movies = Movie.query.filter_by(cluster=cluster).limit(10).all()
+        a, b = random.sample(movies, 2)
+        movies_ids.append(a.tmdb_id)
+        movies_ids.append(b.tmdb_id)
+
+    # result = []
+    # for id in movies_ids:
+    #     result.append(get_metadata(id))
+
+    random.shuffle(movies_ids)
+    return {"movies": movies_ids}, 200
