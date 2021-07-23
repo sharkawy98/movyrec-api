@@ -134,7 +134,6 @@ def update_rating(movie_id):
 
 
 @blueprint.route('/')
-@jwt_required()
 def get_random_movies():
     movies_ids = []
     for cluster in range(14):
@@ -143,9 +142,9 @@ def get_random_movies():
         movies_ids.append(a.tmdb_id)
         movies_ids.append(b.tmdb_id)
 
-    # result = []
-    # for id in movies_ids:
-    #     result.append(get_metadata(id))
+    result = []
+    for id in movies_ids:
+        result.append(get_metadata(id))
 
-    random.shuffle(movies_ids)
-    return {"movies": movies_ids}, 200
+    random.shuffle(result)
+    return {"movies": result}, 200
