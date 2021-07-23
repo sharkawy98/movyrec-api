@@ -1,5 +1,6 @@
 from flask import request
 from flask_jwt_extended import jwt_required, get_jwt_identity
+import random
 
 from api.recommendations import blueprint
 from api.movies.models import Rating
@@ -21,4 +22,8 @@ def get_recommendations():
     for movie_id in tmdb_ids:
         recommendations.append(get_metadata(movie_id))
 
+    if len(recommendations) > 25:
+        recommendations = random.sample(recommendations, 25)
+    
+    random.shuffle(recommendations)
     return {'recommendations': recommendations}, 200
