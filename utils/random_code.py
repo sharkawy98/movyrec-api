@@ -1,6 +1,6 @@
 import math, random
  
-def generate_verification_code() :
+def generate_code() :
     string = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
     length = len(string)
     

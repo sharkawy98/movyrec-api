@@ -1,7 +1,6 @@
 from flask import (
     request, 
-    render_template, 
-    url_for, 
+    render_template,
     current_app
 )
 from marshmallow import ValidationError
@@ -11,13 +10,12 @@ from flask_jwt_extended import (
     get_jwt_identity,
     get_jwt
 )
-from itsdangerous import SignatureExpired, BadTimeSignature
 from datetime import datetime
 import cloudinary, cloudinary.uploader
 
 from api.users import blueprint
 from api.users.models import User, UserSchema
-from utils import activation, send_email, verification
+from utils import send_email, random_code
 from api.base_models import TokenBlocklist
 
 
@@ -40,19 +38,20 @@ def user_register():
         return {"message": "Email already exists."}, 409
 
     user = User(**data)
+
+    # send verification code to user's email
+    code = random_code.generate_code()
+    user.activ_code = code
     user.save()
 
-    # send activation link to new registered user 
-    token = activation.generate_activation_token(user.email)
-    confirm_url = url_for('users_blueprint.user_activation', 
-        token=token, _external=True)
-    
     html = render_template('activation_template.html',
-        username=user.username, confirm_url=confirm_url)
+        username=user.username, activation_code=code)
     subject = "Account Activation"
     send_email.send_email(user.email, subject, html)
-    
-    return user_schema.dump(user), 201
+
+    return {
+        "message": "Account is created and activation code is sent to your email"
+    }, 200
 
 
 @blueprint.route('/login', methods=['POST'])
@@ -90,21 +89,21 @@ def user_logout():
     return {"message": "Logged out successfully."}, 200
     
 
-@blueprint.route('/activate/<token>')
-def user_activation(token):
-    try:
-        email = activation.confirm_activation(token)
-    except SignatureExpired:
-        return '<h1>The token is expired. Register again !</h1>'
-    except BadTimeSignature:
-        return '<h1>Invalid token.</h1>'
+@blueprint.route('/activate', methods=['PUT'])
+def user_activation():
+    username = request.json.get("username")
+    activ_code = request.json.get("activ_code")
 
-    # update activation attribute in the database
-    user = User.get_by_email(email)
+    user = User.get_by_username(username)
+    if user and user.activ_code != activ_code:
+        return {"messege": "Wrong activation code"}, 403
+    elif not user:
+        return {"messege": "Wrong inputs"}, 400
+
     user.is_active = True
     user.update()
 
-    return '<h1>Your account is activated successfully.</h1>'
+    return {"message": "Activated account successfully."}, 200
 
 
 @blueprint.route('/forget_password', methods=['POST'])
@@ -115,27 +114,29 @@ def forget_password():
         return {"message": "Invalid email address."}, 401
 
     # send verification code to user's email
-    code = verification.generate_verification_code()
+    code = random_code.generate_code()
     user.verif_code = code
     user.update()
 
     html = render_template('verification_template.html',
-        verification_code=code)
+        username=user.username, verification_code=code)
     subject = "Reset Password"
     send_email.send_email(user.email, subject, html)
 
-    return {"message": "Verification code is sent"}, 200
+    return {"message": "Verification code is sent to your email"}, 200
 
 
-@blueprint.route('/reset_password', methods=['POST'])
+@blueprint.route('/reset_password', methods=['PUT'])
 def reset_password():
-    email = request.json.get("email")
+    username = request.json.get("username")
     new_password = request.json.get("new_password")
     verif_code = request.json.get("verif_code")
 
-    user = User.get_by_email(email)
-    if user.verif_code != verif_code:
-        return {"messege": "Not allowed"}, 403
+    user = User.get_by_username(username)
+    if user and  user.verif_code != verif_code:
+        return {"messege": "Wrong verification code"}, 403
+    elif not user:
+        return {"messege": "Wrong inputs"}, 400
 
     user.set_password(new_password)
     user.update()
