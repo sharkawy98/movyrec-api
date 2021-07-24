@@ -17,6 +17,7 @@ class User(BaseModel):
     display_img = db.Column(db.String(255), default=None)
     verif_code = db.Column(db.String(6), default=None)
     activ_code = db.Column(db.String(6), default=None)
+    ratings_count = db.Column(db.Integer(), default=0)
 
     def __repr__(self):
         return f'User {self.username}'
@@ -58,16 +59,22 @@ from datetime import datetime
 
 class UserSchema(Schema):
     id = fields.Integer(dump_only=True)
-    full_name = fields.String(required=True)
-    email = fields.Email(required=True)
+    full_name = fields.String(required=True, allow_none=False)
+    email = fields.Email(required=True, allow_none=False)
     username = fields.String(validate=validate.Length(max=30),
-                             required=True)
-    password = fields.String(load_only=True, required=True)
+                             required=True, allow_none=False)
+    password = fields.String(load_only=True, 
+                            required=True, 
+                            allow_none=False)
                             #  validate=validate.Regexp(
                             #     '^(?=.*[0-9]+.*)(?=.*[a-zA-Z]+.*).{7,}$', 
                             #     error='Password must contain at least one letter, one number and be longer than six charaters.'))
-    birthdate = fields.Date(format='%Y-%m-%d', required=True)
-    gender = fields.String(validate=validate.Length(max=1), 
-                           required=True)
+    birthdate = fields.Date(format='%Y-%m-%d',
+                            required=True, 
+                            allow_none=False)
+    gender = fields.String(validate=validate.Length(max=1),
+                            required=True, 
+                            allow_none=False)
     is_active = fields.Boolean(dump_only=True)
     display_img = fields.String(dump_only=True)
+    ratings_count = fields.Integer(dump_only=True)
