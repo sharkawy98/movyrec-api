@@ -99,9 +99,9 @@ def user_activation():
 
     user = User.get_by_username(username)
     if user and user.activ_code != activ_code:
-        return {"messege": "Wrong activation code"}, 403
+        return {"message": "Wrong activation code"}, 403
     elif not user:
-        return {"messege": "Wrong inputs"}, 400
+        return {"message": "Wrong inputs"}, 400
 
     user.is_active = True
     user.update()

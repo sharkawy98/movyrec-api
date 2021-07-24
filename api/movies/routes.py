@@ -148,3 +148,11 @@ def get_random_movies():
 
     random.shuffle(result)
     return {"movies": result}, 200
+
+
+@blueprint.route('/ratings_count')
+@jwt_required()
+def get_ratings_count():
+    user_id = get_jwt_identity()
+    count = Rating.query.filter_by(user_id=user_id).count()
+    return {"ratings_count": count}, 200
