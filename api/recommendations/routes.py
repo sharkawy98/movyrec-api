@@ -26,4 +26,4 @@ def get_recommendations():
         recommendations = random.sample(recommendations, 25)
     
     random.shuffle(recommendations)
-    return {'recommendations': recommendations}, 200
+    return {'movies': recommendations}, 200
