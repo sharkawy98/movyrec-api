@@ -49,8 +49,11 @@ def user_register():
     subject = "Account Activation"
     send_email.send_email(user.email, subject, html)
 
+    access_token = create_access_token(identity=user.id)
+
     return {
-        "message": "Account is created and activation code is sent to your email"
+        "message": "Account is created and activation code is sent to your email",
+        "access_token": access_token
     }, 200
 
 
