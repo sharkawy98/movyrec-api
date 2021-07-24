@@ -13,6 +13,8 @@ from api.movies.models import (
     reviews_schema
 )
 from utils.movie_metadata import get_metadata
+from api.recommendations.models import Recommendations
+from api.users.models import User
 
 
 @blueprint.route('/watch_list/<movie_id>', methods=['POST'])
@@ -40,6 +42,11 @@ def rate_movie(movie_id):
     rating = request.json.get('rating')
     r = Rating(user_id, movie_id, rating)
     r.save()
+
+    user = User.get_by_id(user_id)
+    count = user.ratings_count
+    user.ratings_count = count + 1
+    user.update()
 
     return {"message": "Rated movie successfuly."}, 200
     
@@ -148,11 +155,3 @@ def get_random_movies():
 
     random.shuffle(result)
     return {"movies": result}, 200
-
-
-@blueprint.route('/ratings_count')
-@jwt_required()
-def get_ratings_count():
-    user_id = get_jwt_identity()
-    count = Rating.query.filter_by(user_id=user_id).count()
-    return {"ratings_count": count}, 200
