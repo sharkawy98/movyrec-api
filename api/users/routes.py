@@ -137,9 +137,9 @@ def reset_password():
 
     user = User.get_by_username(username)
     if user and  user.verif_code != verif_code:
-        return {"messege": "Wrong verification code"}, 403
+        return {"message": "Wrong verification code"}, 403
     elif not user:
-        return {"messege": "Wrong inputs"}, 400
+        return {"message": "Wrong inputs"}, 400
 
     user.set_password(new_password)
     user.update()

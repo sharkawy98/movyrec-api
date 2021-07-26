@@ -76,7 +76,7 @@ def get_watch_list():
     for m in watch_list:
         result.append(get_metadata(m.movie_id))
 
-    return {"watch_list": result}, 200
+    return {"movies": result}, 200
 
 
 @blueprint.route('/user_ratings')
@@ -89,7 +89,7 @@ def get_ratings():
     for r in ratings:
         result.append(get_metadata(r.movie_id))
 
-    return {"ratings": result}, 200
+    return {"movies": result}, 200
 
 
 @blueprint.route('/movie_interactions/<movie_id>')
@@ -102,8 +102,8 @@ def get_movie_interactions(movie_id):
     reviews = Review.query.filter_by(movie_id=movie_id).all()
     
     return {
-        "user_rating": rating.rating,
-        "movie_reviews": reviews_schema.dump(reviews)
+        "rating": rating.rating,
+        "reviews": reviews_schema.dump(reviews)
     }, 200
 
 
